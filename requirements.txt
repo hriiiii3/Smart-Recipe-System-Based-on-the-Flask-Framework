@@ -1,0 +1,6 @@
+flask
+mysql-connector-python
+openai
+pandas
+python-dotenv
+sparkai

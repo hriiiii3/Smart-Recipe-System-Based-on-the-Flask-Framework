@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Calories Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e6f7ff; /* 淡蓝色背景 */
+            margin: 0;
+            padding: 20px;
+        }
+
+        #plate {
+            width: 400px;
+            height: 400px;
+            background-image: url('https://i.ibb.co/yy5mYr5/bcf968e0-2046-4c0a-8af8-19c074b91ea7.webp');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            animation: float 3s ease-in-out infinite; /* 上下浮动效果 */
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translatey(0);
+            }
+            50% {
+                transform: translatey(-10px);
+            }
+        }
+
+        .food-item {
+            width: 80px;
+            height: 80px;
+            margin: 10px;
+            cursor: move;
+            transition: transform 0.2s;
+        }
+
+        .food-item:hover {
+            transform: scale(1.1);
+        }
+
+        .food-in-plate {
+            position: absolute;
+            cursor: pointer;
+            font-size: 0.8em;
+            text-align: center;
+            background-color: rgba(173, 216, 230, 0.8); /* 淡蓝色背景 */
+            padding: 5px;
+            border-radius: 5px;
+            border: 2px solid rgba(173, 216, 230, 1); /* 淡蓝色边框 */
+            display: inline-block;
+            box-sizing: border-box; /* 确保背景与图片一致 */
+        }
+
+        #totalCaloriesDisplay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333; /* 字体颜色 */
+        }
+
+        .query-box {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            font-size: 1.2rem;
+        }
+
+        .mdl-button {
+            background-color: #4CAF50; /* 按钮颜色 */
+            color: white;
+        }
+
+        .query-result {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            margin-top: 10px; /* 添加上边距 */
+        }
+
+        .query-result div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-color: rgba(173, 216, 230, 0.8); /* 淡蓝色背景 */
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%; /* 背景等宽 */
+            max-width: 200px; /* 可根据需要调整 */
+            aspect-ratio: 1/1; /* 保持容器为正方形 */
+        }
+
+        #query {
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 1.2rem;
+        }
+
+        button.mdl-button {
+            background-color: #ffeb3b; /* 浅黄色按钮 */
+            color: #333;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>餐盘热量计算器</h1>
+
+        <div class="row mt-4">
+            <div class="col-md-4 query-box">
+                <h3>您今天吃了：</h3>
+                <input type="text" id="query" class="form-control" placeholder="Search for food...">
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mt-2" onclick="searchFood()">搜索</button>
+                <h3>搜索结果：</h3>
+                <div id="food-display" class="query-result"></div>
+            </div>
+
+            <div class="col-md-8">
+                <div id="plate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <p>可以拖拽你今日的食物到餐盘中!</p>
+                </div>
+                <div id="totalCaloriesDisplay" class="mt-3">总热量为: <span id="totalCalories">0</span> kcal</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       let totalCalories = 0;
+    const addedFoodPositions = [];
+
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function drag(event) {
+        const foodData = JSON.parse(event.target.getAttribute('data-food'));
+        event.dataTransfer.setData("text", JSON.stringify(foodData));
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        const foodData = JSON.parse(event.dataTransfer.getData("text"));
+        addFoodToPlate(foodData);
+    }
+
+    function searchFood() {
+        const query = document.getElementById('query').value.trim();
+        const result = document.getElementById('food-display');
+        result.innerHTML = '';
+
+        if (!query) {
+            alert("请输入食物名称");
+            return;
+        }
+
+        fetch(`/search_food?query=${encodeURIComponent(query)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('未找到该食物');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(foodData => {
+                    foodData.portion = 100; // 默认克数为100克
+                    result.innerHTML += 
+                        `<div class="text-center">
+                            <img src="${foodData.image_url}" class="food-item" draggable="true" ondragstart="drag(event)" data-food='${JSON.stringify(foodData)}'>
+                            <p>${foodData.name} (${foodData.calories} kcal / 100g)</p>
+                        </div>`;
+                });
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    }
+
+    function updateCalories(caloriesPer100g, portionChange) {
+        totalCalories += (portionChange / 100) * caloriesPer100g;
+        document.getElementById('totalCalories').textContent = totalCalories.toFixed(2);
+    }
+
+    function addFoodToPlate(foodData) {
+        const foodDiv = document.createElement('div');
+        foodDiv.className = 'food-in-plate';
+        foodDiv.setAttribute('data-food', JSON.stringify(foodData));
+
+        const plate = document.getElementById('plate');
+        const plateRect = plate.getBoundingClientRect();
+        let validPosition = false;
+        let x, y;
+
+        while (!validPosition) {
+            x = Math.random() * (plateRect.width - 80);
+            y = Math.random() * (plateRect.height - 80);
+
+            validPosition = !addedFoodPositions.some(pos => 
+                Math.abs(pos.x - x) < 80 && Math.abs(pos.y - y) < 80
+            );
+        }
+
+        foodDiv.style.left = `${x}px`;
+        foodDiv.style.top = `${y}px`;
+        addedFoodPositions.push({x, y});
+
+        // 添加输入框以修改克数
+        foodDiv.innerHTML = 
+            `<img src="${foodData.image_url}" alt="${foodData.name}" class="food-item-in-plate">
+             <p>${foodData.name}</p>
+             <p>${foodData.calories} kcal / 100g</p>
+             <input type="number" value="${foodData.portion}" min="1" class="food-weight-input" oninput="updatePortion(this, ${foodData.calories})"> 克`;
+
+        plate.appendChild(foodDiv);
+        updateCalories(foodData.calories, foodData.portion);
+    }
+
+    // 动态更新食物克数和热量
+    function updatePortion(inputElement, caloriesPer100g) {
+        const newPortion = parseFloat(inputElement.value);
+        if (isNaN(newPortion) || newPortion <= 0) {
+            alert("请输入有效的克数");
+            return;
+        }
+
+        // 计算新克数下的热量变化
+        const foodDiv = inputElement.closest('.food-in-plate');
+        const foodData = JSON.parse(foodDiv.getAttribute('data-food'));
+        const oldPortion = foodData.portion;
+
+        // 更新食物的克数
+        foodData.portion = newPortion;
+        foodDiv.setAttribute('data-food', JSON.stringify(foodData));
+
+        // 更新总热量（先减去旧的克数热量，再加上新的）
+        totalCalories -= (oldPortion / 100) * caloriesPer100g;
+        totalCalories += (newPortion / 100) * caloriesPer100g;
+        document.getElementById('totalCalories').textContent = totalCalories.toFixed(2);
+    }
+    </script>
+</body>
+</html>
