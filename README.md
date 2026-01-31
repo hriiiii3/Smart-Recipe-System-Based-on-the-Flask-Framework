@@ -27,27 +27,29 @@ plaintext
 ```bash
 git clone [你的仓库完整地址，比如https://github.com/你的用户名/你的仓库名.git]
 cd nutrition_app
-2. 搭建虚拟环境并安装依赖
-bash
-运行
+````
+### 2.创建虚拟环境
+```bash
 # 创建虚拟环境
 python -m venv venv
-
-# 激活虚拟环境
+````
+### 3.激活虚拟环境
+```bash
 # Windows 系统
 .\venv\Scripts\activate
-# Mac/Linux 系统
-source venv/bin/activate
+````
 
-# 安装项目依赖
+### 4.安装项目依赖
+```bash
 pip install -r requirements.txt
-3. 配置数据库
-打开 MySQL，在命令行或 Navicat 中执行下面的语句创建数据库：
+````
+### 5. 配置数据库
+#打开 MySQL，在命令行或 Navicat 中执行下面的语句创建数据库：
+```bash
 sql
 CREATE DATABASE ruangong_fooddb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-找到你项目里的 app.py（或 config.py），把下面的代码替换进去（修改 [] 里的内容）：
-python
-运行
+````
+```bash
 import mysql.connector
 
 def get_db_connection():
@@ -59,18 +61,21 @@ def get_db_connection():
         charset='utf8mb4'
     )
     return connection
-4. 配置 API 密钥（.env 文件）
-在你的项目文件夹根目录，新建一个文件，文件名直接叫「.env」（前面有个点，没有后缀）
-打开这个.env 文件，粘贴下面的内容，修改 [] 里的密钥：
-env
+````
+### 6. 配置 API 密钥（.env 文件）
+#在你的项目文件夹根目录，新建一个文件，文件名直接叫「.env」（前面有个点，没有后缀）
+#打开这个.env 文件，粘贴下面的内容，修改 [] 里的密钥：
+```bash
 OPENAI_API_KEY="[你的OpenAI API密钥]"
 SPARK_APP_ID="[你的讯飞星火APPID]"
 SPARK_API_SECRET="[你的讯飞星火APISecret]"
 SPARK_API_KEY="[你的讯飞星火APIKey]"
-5. 启动项目
-在项目文件夹的命令行里，输入下面的命令，按回车：
-bash
+````
+### 7. 启动项目
+#在项目文件夹的命令行里，输入下面的命令，按回车：
+```bash
 运行
 python app.py
-6. 访问项目
-打开你的浏览器（比如 Chrome），在地址栏输入下面的地址，按回车即可打开应用：
+````
+### 8. 访问项目
+#打开你的浏览器（比如 Chrome），在地址栏输入本地地址
