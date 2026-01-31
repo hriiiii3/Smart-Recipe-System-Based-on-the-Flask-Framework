@@ -23,7 +23,7 @@
 
 ### 1. 克隆仓库
 ```bash
-git clone [你的仓库完整地址，比如https://github.com/你的用户名/你的仓库名.git]
+git clone [本仓库地址]
 cd nutrition_app
 ````
 ### 2.创建虚拟环境
