@@ -1,5 +1,3 @@
-下面这一大段内容，你直接全选、复制，粘贴到你的 README.md 文件中即可，格式会自动渲染正确：
-plaintext
 # Smart-Recipe-System-Based-on-the-Flask-Framework
 这是一个基于 Web 的营养健康助手应用，旨在帮助用户查询食物的营养成分、获取针对特定疾病（如糖尿病）的饮食建议，并计算膳食热量。
 
